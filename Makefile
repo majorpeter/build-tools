@@ -21,16 +21,22 @@ DEFINE_FLAGS := $(addprefix -D,$(DEFINES))
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CXX_FLAGS := $(COMMON_FLAGS) $(DEFINE_FLAGS)
+CXX_FLAGS := $(COMMON_FLAGS) $(DEFINE_FLAGS) $(INC_FLAGS)
+C_FLAGS := $(CXX_FLAGS) -std=gnu11
+CPP_FLAGS := $(CXX_FLAGS) -std=gnu++11 -fabi-version=0 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics
+
 LINKER_SCRIPTS := mem.ld libs.ld sections.ld
 LINKER_SCRIPT_FOLDERS := "ldscripts"
-LINKER_FLAGS := $(addprefix -T ,$(LINKER_SCRIPTS)) $(addprefix -L,$(LINKER_SCRIPT_FOLDERS))
+LINKER_FLAGS := $(addprefix -T ,$(LINKER_SCRIPTS)) \
+				$(addprefix -L,$(LINKER_SCRIPT_FOLDERS)) \
+				-nostartfiles -Xlinker --gc-sections \
+				-Wl,-Map,"$(BUILD_DIR)/$(PROJECT_NAME).map" --specs=nano.specs
 
 ## ELF (main output)
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C++ Linker'
-	arm-none-eabi-g++ $(COMMON_FLAGS) $(LINKER_FLAGS) -nostartfiles -Xlinker --gc-sections -Wl,-Map,"$(BUILD_DIR)/$(PROJECT_NAME).map" --specs=nano.specs -o "$@" $(OBJS) $(LDFLAGS)
+	arm-none-eabi-g++ $(COMMON_FLAGS) $(LINKER_FLAGS) -o "$@" $(OBJS) $(LDFLAGS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -45,7 +51,7 @@ $(BUILD_DIR)/%.c.o: %.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: C Compiler'
 	@$(MKDIR_P) $(dir $@)
-	arm-none-eabi-gcc -mcpu=cortex-m3 $(CXX_FLAGS) $(INC_FLAGS) -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	arm-none-eabi-gcc $(C_FLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -54,7 +60,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM C++ Compiler'
 	@$(MKDIR_P) $(dir $@)
-	arm-none-eabi-g++ $(CXX_FLAGS) $(INC_FLAGS) -std=gnu++11 -fabi-version=0 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	arm-none-eabi-g++ $(CPP_FLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
