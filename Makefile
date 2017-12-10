@@ -32,36 +32,43 @@ LINKER_FLAGS := $(addprefix -T ,$(LINKER_SCRIPTS)) \
 				-nostartfiles -Xlinker --gc-sections \
 				-Wl,-Map,"$(BUILD_DIR)/$(PROJECT_NAME).map" --specs=nano.specs
 
+COLOR_RED=\e[0;31m
+COLOR_YELLOW=\e[0;33m
+COLOR_BLUE=\e[0;34m
+COLOR_CYAN=\e[0;36m
+COLOR_NONE=\e[0m
+
 ## ELF (main output)
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	@echo 'Building target: $@'
-	@echo 'Invoking: C++ Linker'
+	@echo -e "$(COLOR_CYAN)Building target:$(COLOR_NONE)" "$@"
+	@echo -e "$(COLOR_BLUE)Invoking: C++ Linker$(COLOR_NONE)"
 	arm-none-eabi-g++ $(COMMON_FLAGS) $(LINKER_FLAGS) -o "$@" $(OBJS) $(LDFLAGS)
-	@echo 'Finished building target: $@'
+	@echo -e "$(COLOR_CYAN)Finished building target:$(COLOR_NONE)" "$@"
 	@echo ' '
 
 $(BUILD_DIR)/$(TARGET_HEX): $(BUILD_DIR)/$(TARGET_EXEC)
-	@echo 'Invoking: Cross ARM GNU Create Flash Image'
+	@echo -e "$(COLOR_CYAN)Building image:$(COLOR_NONE)" "$@"
+	@echo -e "$(COLOR_BLUE)Invoking: Cross ARM GNU Create Flash Image$(COLOR_NONE)"
 	arm-none-eabi-objcopy -O ihex "$<"  "$@"
-	@echo 'Finished building: $@'
+	@echo -e "$(COLOR_CYAN)Finished building:$(COLOR_NONE)" "$@"
 	@echo ' '
 
 # c source
 $(BUILD_DIR)/%.c.o: %.c
-	@echo 'Building file: $<'
-	@echo 'Invoking: C Compiler'
+	@echo -e "$(COLOR_CYAN)Building file:$(COLOR_NONE)" "$<"
+	@echo -e "$(COLOR_BLUE)Invoking: C Compiler$(COLOR_NONE)"
 	@$(MKDIR_P) $(dir $@)
 	arm-none-eabi-gcc $(C_FLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
-	@echo 'Finished building: $<'
+	@echo -e "$(COLOR_CYAN)Finished building:$(COLOR_NONE)" "$<"
 	@echo ' '
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
-	@echo 'Building file: $<'
-	@echo 'Invoking: Cross ARM C++ Compiler'
+	@echo -e "$(COLOR_CYAN)Building file:$(COLOR_NONE)" "$<"
+	@echo -e "$(COLOR_BLUE)Invoking: Cross ARM C++ Compiler$(COLOR_NONE)"
 	@$(MKDIR_P) $(dir $@)
 	arm-none-eabi-g++ $(CPP_FLAGS) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
-	@echo 'Finished building: $<'
+	@echo -e "$(COLOR_CYAN)Finished building:$(COLOR_NONE)" "$<"
 	@echo ' '
 
 .PHONY: all clean
