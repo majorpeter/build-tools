@@ -1,6 +1,6 @@
 # based on: https://spin.atomicobject.com/2016/08/26/makefile-c-projects/
 
-PROJECT_NAME := InfinityClock
+PROJECT_NAME ?= Project
 TARGET_EXEC ?= $(PROJECT_NAME).elf
 TARGET_HEX ?= $(PROJECT_NAME).hex
 
@@ -8,8 +8,7 @@ BUILD_DIR ?= ./build
 SRC_DIRS ?= application modules system
 
 SRCS_ALL := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
-SRCS_EXCEPT := application/testmain.cpp \
-			   modules/mprotocol-server/ServerSocketInterface.cpp
+SRCS_EXCEPT := modules/mprotocol-server/ServerSocketInterface.cpp
 SRCS := $(filter-out $(SRCS_EXCEPT),$(SRCS_ALL))
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
@@ -26,7 +25,7 @@ C_FLAGS := $(CXX_FLAGS) -std=gnu11
 CPP_FLAGS := $(CXX_FLAGS) -std=gnu++11 -fabi-version=0 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics
 
 LINKER_SCRIPTS := mem.ld libs.ld sections.ld
-LINKER_SCRIPT_FOLDERS := "ldscripts"
+LINKER_SCRIPT_FOLDERS := "$(BUILD_TOOLS_PATH)ldscripts"
 LINKER_FLAGS := $(addprefix -T ,$(LINKER_SCRIPTS)) \
 				$(addprefix -L,$(LINKER_SCRIPT_FOLDERS)) \
 				-nostartfiles -Xlinker --gc-sections \
