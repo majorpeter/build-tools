@@ -43,6 +43,7 @@ $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	@echo -e "$(COLOR_BLUE)Invoking: C++ Linker$(COLOR_NONE)"
 	arm-none-eabi-g++ $(COMMON_FLAGS) $(LINKER_FLAGS) -o "$@" $(OBJS) $(LDFLAGS)
 	@echo -e "$(COLOR_CYAN)Finished building target:$(COLOR_NONE)" "$@"
+	@make -s size
 	@echo ' '
 
 $(BUILD_DIR)/$(TARGET_HEX): $(BUILD_DIR)/$(TARGET_EXEC)
@@ -70,9 +71,12 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	@echo -e "$(COLOR_CYAN)Finished building:$(COLOR_NONE)" "$<"
 	@echo ' '
 
-.PHONY: all clean
+.PHONY: all size clean
 
 all: $(BUILD_DIR)/$(TARGET_EXEC) $(BUILD_DIR)/$(TARGET_HEX)
+
+size: $(BUILD_DIR)/$(TARGET_EXEC)
+	@arm-none-eabi-size $<
 
 clean:
 	$(RM) -r $(BUILD_DIR)
