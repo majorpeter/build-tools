@@ -71,7 +71,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	@echo -e "$(COLOR_CYAN)Finished building:$(COLOR_NONE)" "$<"
 	@echo ' '
 
-.PHONY: all size clean
+.PHONY: all size clean run-openocd
 
 all: $(BUILD_DIR)/$(TARGET_EXEC) $(BUILD_DIR)/$(TARGET_HEX)
 
@@ -80,6 +80,9 @@ size: $(BUILD_DIR)/$(TARGET_EXEC)
 
 clean:
 	$(RM) -r $(BUILD_DIR)
+
+run-openocd: $(BUILD_DIR)/$(TARGET_EXEC)
+	openocd -f $(BUILD_TOOLS_PATH)/openocd_stm32f1.cfg
 
 -include $(DEPS)
 
