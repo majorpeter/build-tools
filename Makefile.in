@@ -8,7 +8,6 @@ BUILD_DIR ?= ./build
 SRC_DIRS ?= application modules system
 
 SRCS_ALL := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
-SRCS_EXCEPT := modules/mprotocol-server/ServerSocketInterface.cpp
 SRCS := $(filter-out $(SRCS_EXCEPT),$(SRCS_ALL))
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
