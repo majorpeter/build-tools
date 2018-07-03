@@ -3,6 +3,7 @@
 PROJECT_NAME ?= Project
 TARGET_EXEC ?= $(PROJECT_NAME).elf
 TARGET_HEX ?= $(PROJECT_NAME).hex
+TARGET_BIN ?= $(PROJECT_NAME).bin
 
 BUILD_DIR ?= ./build
 SRC_DIRS ?= application modules system
@@ -52,6 +53,13 @@ $(BUILD_DIR)/$(TARGET_HEX): $(BUILD_DIR)/$(TARGET_EXEC)
 	@echo -e "$(COLOR_CYAN)Finished building:$(COLOR_NONE)" "$@"
 	@echo ' '
 
+$(BUILD_DIR)/$(TARGET_BIN): $(BUILD_DIR)/$(TARGET_EXEC)
+	@echo -e "$(COLOR_CYAN)Building image:$(COLOR_NONE)" "$@"
+	@echo -e "$(COLOR_BLUE)Invoking: Cross ARM GNU Create Flash Image$(COLOR_NONE)"
+	arm-none-eabi-objcopy -O binary "$<"  "$@"
+	@echo -e "$(COLOR_CYAN)Finished building:$(COLOR_NONE)" "$@"
+	@echo ' '
+
 # c source
 $(BUILD_DIR)/%.c.o: %.c
 	@echo -e "$(COLOR_CYAN)Building file:$(COLOR_NONE)" "$<"
@@ -72,7 +80,7 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 
 .PHONY: all size clean run-openocd
 
-all: $(BUILD_DIR)/$(TARGET_EXEC) $(BUILD_DIR)/$(TARGET_HEX)
+all: $(BUILD_DIR)/$(TARGET_EXEC) $(BUILD_DIR)/$(TARGET_HEX) $(BUILD_DIR)/$(TARGET_BIN)
 
 size: $(BUILD_DIR)/$(TARGET_EXEC)
 	@arm-none-eabi-size $<
